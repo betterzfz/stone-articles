@@ -53,9 +53,7 @@ public function filter_data_before_query($data){
 }
 ```
 * 数据库字段的备注应尽量和页面上使用的文本保持一致。
-
 * 在数据查询中应该尽量在条件中先过滤掉尽可能多的数据。
-
 * 在`html`页面中进行注释的时候，大部分程序员会忽略嵌入`html`中的`php`代码，如：
 ```php
 <!--<li>
@@ -85,13 +83,13 @@ public function filter_data_before_query($data){
 </li>-->
 ```
 当一段代码不再使用的时候，应该及时去掉，如果在可以预见的将来会再次用到这段代码那也应该连`php`代码一起注释掉。
-
-* 的`edit_goods()`方法中，在`567`行：
+* 对于使用`cakephp`作为开发框架的项目，如果使用`created`和`modified`作为记录的创建时间和修改时间时可以不用维护这两个字段，如下：
 ```php
-$s_data['modified']    = date("Y-m-d H:i:s");
+$s_data['created']    = date('Y-m-d H:i:s');
+$s_data['modified']    = date('Y-m-d H:i:s');
+$this->Order->save($s_data);
 ```
-这行代码其实是没有必要的，当使用`cakephp`的`ORM`提供的方法进行数据的添加和修改时，默认会使用`created`和`modified`来作为记录的创建时间和修改时间，如果数据表中也确实是使用者两个英文单词作为创建时间和修改时间的话，则ORM会在数据添加或修改时自动把当前时间作为`created`或`modified`的值。
-
+上面的代码其实是没有必要的，当使用`cakephp`的`ORM`提供的方法进行数据的添加和修改时，默认会使用`created`和`modified`来作为记录的创建时间和修改时间，如果数据表中也确实是使用者两个英文单词作为创建时间和修改时间的话，则ORM会在数据添加或修改时自动把当前时间作为`created`或`modified`的值。
 * 当使用`cakephp`作为开发框架的时候，`created`和`modified`是数据库中保存记录的创建时间和修改时间的默认字段名，目前存在许多数据表使用了各式各样记录的创建时间和修改时间的字段名，这并不耽误使用和功能的实现，但在使用`cakephp`作为开发框架的情况下，`created`和`modified`始终是更好的选择。
 * 没有使用模板引擎的项目中，在模板文件里面进行逻辑判断时很多开发这会使用`echo`或`print`进行文本输出，如：
 ```php
