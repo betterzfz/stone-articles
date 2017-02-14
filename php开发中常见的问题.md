@@ -12,7 +12,7 @@ header("Content-Type:text/html;charset=utf8");
 ```php
 header('Content-Type: text/html; charset=utf-8');
 ```
-* ：
+* 接收请求数据应该做安全检查和处理，而不需要增加变量，可以直接使用。如果非要增加变量也没有必要加上无意义的遍历，如：
 ```php
 $s_data = array();
 $flag_g = $flag_gc = false; # 记录事务        
@@ -21,12 +21,38 @@ foreach ($_POST as $k => $v) {
 }
 ```
 可以改为：
-
 ```php
 $s_data = $_POST;
 $flag_g = $flag_gc = false; # 记录事务
 ```
-* `qbs_goods.unit`的备注是`计价单位`，但是页面上该字段显示的是`计量单位`。
+需要说明的是上面的做法依然不科学，因为没有必要将`$_POST`赋值给`$s_data`，直接使用`$_POST`即可。当然如果要与数据库交互，在使用`$_POST`的时候要先对数据进行过滤和转义，如果仅仅是根据`$_POST`数据进行数据库查询，可以使用下面类似的方法处理：
+```php
+/**
+ * 执行查询sql语句之前的数据过滤
+ * @param $data 需要过滤的数据 数组
+ * @return 过滤的结果 数组
+ * @author stone
+ */
+public function filter_data_before_query($data){
+    if (!empty($data) && is_array($data)) {
+        foreach ($data as $key => $value) {
+            if (!is_array($value) && !is_object($value)) {
+                $data[$key] = htmlspecialchars(trim($data[$key]));
+                if (!get_magic_quotes_gpc()) {
+                    $data[$key] = addslashes($data[$key]);
+                }
+                if (is_int($value)) {
+                    $data[$key] = intval($data[$key]);
+                }
+            }
+        }
+        return $data;
+    } else {
+        return ['code' => -1, 'message' => '提供的参数需要为数组'];
+    }
+}
+```
+* 数据库字段的备注应尽量和页面上使用的文本保持一致。
 
 * 在数据查询中应该尽量在条件中先过滤掉尽可能多的数据。
 
